@@ -7,6 +7,7 @@ import com.example.etax.data.local.MoviesDataBase
 import com.example.etax.data.remote.ApiService
 import com.example.etax.data.repository.MoviesRepositoryImpl
 import com.example.etax.domain.repository.MoviesRepository
+
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -37,7 +38,7 @@ object DataModule {
     fun provideApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
-    
+
 
     @Singleton
     @Provides
@@ -62,6 +63,8 @@ object DataModule {
         return MoviesRepositoryImpl(workManager, movieDao)
 
     }
+
+
 
 
 }
