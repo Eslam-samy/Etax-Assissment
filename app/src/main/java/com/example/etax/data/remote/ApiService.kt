@@ -10,7 +10,7 @@ interface ApiService {
 
     //https://api.themoviedb.org/3/movie/now_playing?api_key=YOUR_API_KEY
 
-    @GET("movie/now_playing")
+    @GET("now_playing")
     suspend fun getNowPlayingMovies(
         @Query("api_key") apiKey: String,
         @Query("page") page: Int

@@ -37,8 +37,11 @@ class FetchWorker @AssistedInject constructor(
                     page = page
                 )
 
-                totalPages = response.totalPages
-                movieDao.insertMovies(response.results.map { it.toDomain() })
+                totalPages = response.totalPages.toInt()
+                val moviesWithOrder = response.results.mapIndexed { index, result ->
+                    result.copy(position = index).toDomain()
+                }
+                movieDao.insertMovies(moviesWithOrder)
                 PrefUtils.saveToPrefs(context, PrefKeys.LAST_FETCHED_PAGE, page)
                 page++
             }

@@ -1,19 +1,16 @@
 package com.example.etax.data.model
 
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
+import com.google.gson.annotations.SerializedName
 data class NowPlayingDto(
-    @SerialName("dates")
+    @SerializedName("dates")
     val dates: DatesDto = DatesDto(),
-    @SerialName("page")
+    @SerializedName("page")
     val page: Int = 0,
-    @SerialName("results")
+    @SerializedName("results")
     val results: List<ResultDto> = listOf(),
-    @SerialName("total_pages")
+    @SerializedName("total_pages")
     val totalPages: Int = 0,
-    @SerialName("total_results")
+    @SerializedName("total_results")
     val totalResults: Int = 0
 )

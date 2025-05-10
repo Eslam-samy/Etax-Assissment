@@ -1,13 +1,13 @@
 package com.example.etax.data.model
 
 
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
 data class DatesDto(
-    @SerialName("maximum")
+    @SerializedName("maximum")
     val maximum: String = "",
-    @SerialName("minimum")
+    @SerializedName("minimum")
     val minimum: String = ""
 )

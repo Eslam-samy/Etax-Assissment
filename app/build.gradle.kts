@@ -2,7 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("kapt")
+    alias(libs.plugins.dagger)
+    id("com.google.devtools.ksp")
     kotlin("plugin.serialization") version "1.8.10"
 }
 
@@ -20,16 +21,20 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "API_KEY", "\"$apiKey\"")
+
     }
 
     buildTypes {
         release {
+            buildConfigField("String", "API_KEY", "\"$apiKey\"")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            buildConfigField("String", "API_KEY", "\"$apiKey\"")
         }
     }
     compileOptions {
@@ -66,22 +71,30 @@ dependencies {
 
     implementation(libs.work.manager)
     implementation(libs.work.manager.dagger)
-    kapt(libs.work.manager.dagger.kapt)
+    ksp(libs.work.manager.dagger.kapt)
     implementation(libs.hilt.compose.navigation)
 
 
     implementation(libs.dagger.hilt)
-    kapt(libs.dagger.kapt)
+    ksp(libs.dagger.kapt)
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson.convertor)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
     implementation(libs.room.ktx)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
+    implementation (libs.androidx.room.paging)
 
     implementation(libs.kotlinx.serialization.json)
 
     //shared pref
     implementation(libs.androidx.preference.ktx)
+
+
+    implementation (libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.compose)
+
 
 }

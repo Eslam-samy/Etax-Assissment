@@ -1,6 +1,7 @@
 package com.example.etax.data.di
 
 import android.content.Context
+import android.util.Log
 import androidx.work.WorkManager
 import com.example.etax.data.local.MovieDao
 import com.example.etax.data.local.MoviesDataBase
@@ -14,8 +15,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -24,13 +30,32 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun provideRetrofitService(): Retrofit {
+    fun provideRetrofitService(
+        okHttpClient: OkHttpClient
+    ): Retrofit {
         return Retrofit
             .Builder()
             .baseUrl("https://api.themoviedb.org/3/movie/")
             .addConverterFactory(
                 GsonConverterFactory.create(GsonBuilder().create())
             )
+            .client(okHttpClient)
+            .build()
+    }
+
+    @Singleton
+    @Provides
+    fun createOkHttpClient(
+        @ApplicationContext context: Context
+    ): OkHttpClient {
+        val httpLoggingInterceptor = HttpLoggingInterceptor { message: String? ->
+            Log.e("Call", "createOkHttpClient: $message")
+        }
+        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+        return OkHttpClient().newBuilder()
+            .readTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(httpLoggingInterceptor)
             .build()
     }
 

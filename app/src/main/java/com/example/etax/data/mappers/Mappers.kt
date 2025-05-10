@@ -7,7 +7,7 @@ fun ResultDto.toDomain(): Result {
     return Result(
         adult,
         backdropPath,
-        id,
+        id!!,
         originalLanguage,
         originalTitle,
         overview,
@@ -16,6 +16,8 @@ fun ResultDto.toDomain(): Result {
         releaseDate,
         title,
         video,
-        voteAverage
+        voteAverage,
+        voteCount,
+        position
     )
 }

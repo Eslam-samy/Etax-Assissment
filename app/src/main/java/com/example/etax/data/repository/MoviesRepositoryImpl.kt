@@ -1,58 +1,67 @@
 package com.example.etax.data.repository
 
-import androidx.compose.ui.util.trace
+import androidx.paging.PagingSource
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.etax.data.local.MovieDao
 import com.example.etax.data.worker.CacheManagementWorker
 import com.example.etax.data.worker.FetchWorker
-import com.example.etax.data.worker.PeriodicWorker
 import com.example.etax.domain.model.Result
 import com.example.etax.domain.repository.MoviesRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 class MoviesRepositoryImpl(
     private val workManager: WorkManager,
     private val movieDao: MovieDao
 ) : MoviesRepository {
-    override fun getMovie() {
+    override suspend fun getMovie() {
+
         val constraint = Constraints.Builder()
             .setRequiresBatteryNotLow(true)
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
-
-        val workRequest = OneTimeWorkRequestBuilder<FetchWorker>()
-            .setConstraints(constraint)
-            .build()
-
-        workManager.enqueue(
-            workRequest
-        )
-    }
-
-    override fun getAllMovies(): Flow<List<Result>> = movieDao.getAllMovies()
-
-    override fun setPeriodicWorkRequest() {
-        val constraint = Constraints.Builder()
-            .setRequiresBatteryNotLow(true)
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-        val worRequest =
-            PeriodicWorkRequestBuilder<PeriodicWorker>(15, TimeUnit.MINUTES)
+        if (movieDao.getMoviesCount() == 0) {
+            val workRequest = OneTimeWorkRequestBuilder<FetchWorker>()
                 .setConstraints(constraint)
                 .build()
+            workManager.enqueue(
+                workRequest
+            )
+        } else {
+            val worRequest =
+                PeriodicWorkRequestBuilder<FetchWorker>(15, TimeUnit.MINUTES)
+                    .setConstraints(constraint)
+                    .build()
 
-        workManager.enqueueUniquePeriodicWork(
-            "periodic_fetch_management",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            worRequest
-        )
+            workManager.enqueueUniquePeriodicWork(
+                "periodic_fetch_management",
+                ExistingPeriodicWorkPolicy.UPDATE,
+                worRequest
+            )
+        }
+
+
+    }
+
+    override suspend fun getMovieCount(): Int = withContext(Dispatchers.IO) {
+        movieDao.getMoviesCount()
+    }
+
+    override fun getPagedMovies(
+        page: Int
+    ): Flow<List<Result>> =
+        movieDao.getPagedMovies(20, (page - 1) * 20)
+
+    override fun getMoviesPagingSource(): PagingSource<Int, Result> {
+        // This returns Room's auto-invalidating PagingSource
+        return movieDao.getAllMoviesPaged()
     }
 
     override fun setPeriodicCacheValidation() {

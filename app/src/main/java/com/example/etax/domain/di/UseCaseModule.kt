@@ -1,12 +1,8 @@
 package com.example.etax.domain.di
 
-import com.example.etax.data.local.MovieDao
 import com.example.etax.domain.repository.MoviesRepository
 import com.example.etax.domain.usecases.CheckMoviesInDatabaseUseCase
-import com.example.etax.domain.usecases.FetchMovieDataUseCase
-import com.example.etax.domain.usecases.GetAllMoviesUseCase
 import com.example.etax.domain.usecases.SetCacheValidationUseCase
-import com.example.etax.domain.usecases.SetPeriodicFetchUseCase
 
 import dagger.Module
 import dagger.Provides
@@ -18,17 +14,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object UseCaseModule {
 
-    @Provides
-    @Singleton
-    fun provideFetchMovieDataUseCase(repository: MoviesRepository): FetchMovieDataUseCase {
-        return FetchMovieDataUseCase(repository)
-    }
 
-    @Provides
-    @Singleton
-    fun provideSetPeriodicFetchUseCase(repository: MoviesRepository): SetPeriodicFetchUseCase {
-        return SetPeriodicFetchUseCase(repository)
-    }
 
     @Provides
     @Singleton
@@ -39,15 +25,9 @@ object UseCaseModule {
     @Provides
     @Singleton
     fun provideCheckMoviesInDatabaseUseCase(
-        movieDao: MovieDao,
         repository: MoviesRepository
     ): CheckMoviesInDatabaseUseCase {
-        return CheckMoviesInDatabaseUseCase(movieDao, repository)
+        return CheckMoviesInDatabaseUseCase(repository)
     }
 
-    @Provides
-    @Singleton
-    fun provideGetAllMoviesUseCase(repository: MoviesRepository): GetAllMoviesUseCase {
-        return GetAllMoviesUseCase(repository)
-    }
 }

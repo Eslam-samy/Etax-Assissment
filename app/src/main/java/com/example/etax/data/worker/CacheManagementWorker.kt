@@ -20,7 +20,6 @@ const val CACHE_MANAGEMENT_WORK_NAME = "CACHE_MANAGEMENT_WORK_NAME"
 class CacheManagementWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val params: WorkerParameters,
-    private val apiService: ApiService,
     private val movieDao: MovieDao
 ) : CoroutineWorker(
     context, params
@@ -31,6 +30,8 @@ class CacheManagementWorker @AssistedInject constructor(
         return try {
             if (lastUpdateTime.isCacheStale()) {
                 movieDao.deleteAllMovies()
+                PrefUtils.saveToPrefs(context, PrefKeys.LAST_CACHE_UPDATE_TIME, 0L)
+                PrefUtils.saveToPrefs(context, PrefKeys.LAST_FETCHED_PAGE, 1)
             }
 
             Result.success() // Successful execution
